@@ -1,11 +1,11 @@
 const express = require('express');
 const Sequelize = require('sequelize');
 const path = require('path');
-
+const Books = require('./models/book.js');
 const app = express();
 const port = 3000;
 
-const UserRouter = express.Router();
+const Router = express.Router();
 //dialect specifies the specific version of sql im using
 //storage key to specify the path for sqlite and create a database called library
 const sequelize = new Sequelize ({
@@ -16,10 +16,11 @@ const sequelize = new Sequelize ({
 
 //Defing Library model
 //initialize the model
-class Library extends Sequelize.Model {}
+module.exports = (sequelize) =>{
+class Books extends Sequelize.Model {}
 //defines a new table in the database with the name Library. Seq looks for information in that table
 //string identifies that the variable will be set to up to  255 characters and interger is a number variable
-Library.init({
+    Books.init({
     id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -57,7 +58,14 @@ Library.init({
         type: Sequelize.INTEGER,
         allowNull: false,
     },
-}, {sequelize});
+},
+    {
+        freezeTableName: true,
+      sequelize
+    }, 
+    {sequelize});
+    return Books;
+}
     
 //IIFE(Immediately Invoked Function Expression) is a JavaScript function that runs as soon as it is define
 //authenticate returns a promise that resolves to a successful connection to database
@@ -65,15 +73,15 @@ Library.init({
 (async () => {
     await sequelize.sync({force:true});
     try{
-        const books = await Library.create({
+        const books1 = await Books.create({
             title: 'Chicka Chicka Boom Boom',
             author: ' Bill Martin, Jr',
             genre:'Children',
             year:1989
         });
-        console.log(books.toJSON());
+        console.log(books1.toJSON());
         // await books.save();
-        const books2 = await Library.create({
+        const books2 = await Books.create({
             title: 'Red Fish Blue Fish',
             author: ' Dr.Seuss',
             genre: 'Children',
@@ -81,7 +89,14 @@ Library.init({
         });
         console.log(books2.toJSON());
         //converts to json
-        
+        const books3 = await Books.build({
+            title: 'where the wild things are',
+            author: 'Maurice Sendak',
+            genre: 'Children',
+            year: 1963
+        });
+        await books3.save();
+        console.log(books3.toJSON());
     }catch(error){
         if(error.name === 'SequelizeValidationError'){
             const errors = error.errors.map(err => err.message);

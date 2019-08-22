@@ -1,9 +1,11 @@
 body {
   padding: 10px 50px 50px;
   font: 18px "Garamond", serif;
-  background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRusO3OiDWpssmoFpLUPbgocChb2sQiJ8ZJ40XljorreVNPvXLpZQ")
+  background-color: chartreuse;
 }
-
+title{
+  color:blueviolet;
+}
 a {
   color: #019875;
   text-decoration: none;
@@ -64,7 +66,7 @@ tr {
   min-height: 50px;
 }
 
-tr:nth-child(2n) {
+tr:nth-child(even) {
   background: #E7E7E7;
 }
 

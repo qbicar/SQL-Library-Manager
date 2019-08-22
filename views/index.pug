@@ -1,15 +1,41 @@
-//extends layout.pug
-html
-  head
-    title Books
-    link(rel='stylesheets', href='../public/stylesheets/styles.css', type='text/css')
-  body
-    block content 
-        h1 Library Application
-    block content
-         a.button(href='/books/new') Create New Book
-    block foot   
-      #footer
-        p some content
-  
-  
+extends layout.pug
+
+block content
+  title Books
+  div
+    h1 Books
+    p
+      a.button(href='/books/new') Create New Book
+    table
+      thead
+        tr
+          th Title
+          th Author
+          th Genre
+          th Year
+      tbody
+      <!-- each book in booklist -->
+        tr
+          td
+            a(href='book_detail.html') A Brief History of Time
+          td Stephen Hawking
+          td Non Fiction
+          td 1988 
+        tr
+          td
+            a(href='book_detail.html') A Brief History of Time
+          td Stephen Hawking
+          td Non Fiction
+          td 1988
+        tr 
+          td
+            a(href='book_detail.html') A Brief History of Time
+          td Stephen Hawking
+          td Non Fiction
+          td 1988 
+        tr 
+          td
+            a(href='book_detail.html') A Brief History of Time
+          td Stephen Hawking
+          td Non Fiction
+          td 1988         
