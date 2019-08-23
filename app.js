@@ -1,5 +1,5 @@
 const express = require('express');
-const Sequelize = require('sequelize');
+// const Sequelize = require('sequelize');
 const path = require('path');
 const Books = require('./models').Books;
 const app = express();
@@ -11,11 +11,12 @@ const port = 3000;
 const sequelize = require('./models').sequelize;
 
 sequelize.sync()
-    .then(
+    .then(() => {
         Books.findAll()
             .then((books) => {
                 console.log(books)
             })
+    }
     )
     .then(() => {
         Books.create({
