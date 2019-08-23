@@ -4,80 +4,78 @@ const path = require('path');
 const Books = require('./models/book.js');
 const app = express();
 const port = 3000;
-
-const Router = express.Router();
 //dialect specifies the specific version of sql im using
 //storage key to specify the path for sqlite and create a database called library
-const sequelize = new Sequelize ({
+const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: 'library.db',
+    storage: 'data/library.db',
     logging: false, //disables log in terminal
 });
 
 //Defing Library model
 //initialize the model
-module.exports = (sequelize) =>{
-class Books extends Sequelize.Model {}
-//defines a new table in the database with the name Library. Seq looks for information in that table
-//string identifies that the variable will be set to up to  255 characters and interger is a number variable
+module.exports = (sequelize) => {
+    class Books extends Sequelize.Model { }
+    //defines a new table in the database with the name Library. Seq looks for information in that table
+    //string identifies that the variable will be set to up to  255 characters and interger is a number variable
     Books.init({
-    id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-    },
-    title: {
-        type:Sequelize.STRING,
-        allowNull: false, //disallow Null
-        validate: {
-            notNull: {
-                msg: 'Please provide a value for "Title"',
+        id: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+        },
+        title: {
+            type: Sequelize.STRING,
+            allowNull: false, //disallow Null
+            validate: {
+                notNull: {
+                    msg: 'Please provide a value for "Title"',
+                },
+                notEmpty: {
+                    msg: 'Please provide a value for "Title"',
+                }
             },
-            notEmpty: {
-                msg: 'Please provide a value for "Title"',
-            }
-         },
-    },
-    author: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        validate:{
-            notNull:{
-                msg: 'Please provide a value for "Author"', 
+        },
+        author: {
+            type: Sequelize.STRING,
+            allowNull: false,
+            validate: {
+                notNull: {
+                    msg: 'Please provide a value for "Author"',
+                },
+                notEmpty: {
+                    msg: 'Please provide a value for "Author"',
+                }
             },
-            notEmpty: {
-                msg: 'Please provide a value for "Author"',
-            }
-         },
+        },
+        genre: {
+            type: Sequelize.STRING,
+            allowNull: false,
+        },
+        year: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+        },
     },
-    genre: {
-        type: Sequelize.STRING,
-        allowNull: false,
-    },
-    year: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-    },
-},
-    {
-        freezeTableName: true,
-      sequelize
-    }, 
-    {sequelize});
+        {
+            freezeTableName: true,
+            sequelize
+        },
+        { sequelize });
     return Books;
 }
-    
+
 //IIFE(Immediately Invoked Function Expression) is a JavaScript function that runs as soon as it is define
 //authenticate returns a promise that resolves to a successful connection to database
 //force sync library table and logging the data returned by library.toJson();
 (async () => {
-    await sequelize.sync({force:true});
-    try{
+    await sequelize.sync({ force: true });
+    try {
         const books1 = await Books.create({
             title: 'Chicka Chicka Boom Boom',
             author: ' Bill Martin, Jr',
-            genre:'Children',
-            year:1989
+            genre: 'Children',
+            year: 1989
         });
         console.log(books1.toJSON());
         // await books.save();
@@ -97,11 +95,16 @@ class Books extends Sequelize.Model {}
         });
         await books3.save();
         console.log(books3.toJSON());
-    }catch(error){
-        if(error.name === 'SequelizeValidationError'){
+        // findByPk() (or 'find by primary key') retrieves a single instance by its primary key 
+        const bookById = await Books.findAll({
+            attributes: ['id', 'title'],
+        });
+        console.log(bookById.toJSON());
+    } catch (error) {
+        if (error.name === 'SequelizeValidationError') {
             const errors = error.errors.map(err => err.message);
             console.error('Validation errors:', errors)
-        }else{
+        } else {
             throw error;
         }
     }
@@ -112,7 +115,7 @@ app.set('views', path.join(__dirname, "views"))
 app.use("/static", express.static(__dirname + '/public'))
 
 app.get('/', (req, res) => {
-    res.render('index')
+    res.render('index', { Books })
     //res.render('index', { books})
 });
 
