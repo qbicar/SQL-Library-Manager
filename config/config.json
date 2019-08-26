@@ -2,7 +2,7 @@
   "development": {
     "username": "root",
     "password": null,
-    "database": "library.db",
+    "storage": "library.db",
     "host": "127.0.0.1",
     "dialect": "sqlite",
     "operatorsAliases": false
