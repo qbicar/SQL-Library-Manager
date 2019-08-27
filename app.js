@@ -6,20 +6,23 @@ const port = 3000;
 const sequelize = require('./models').sequelize;
 const bodyParser = require('body-parser');
 
+//<=======Setting view engine to reference view pugs===========>
 app.set('view engine', 'pug')
 app.set('views', path.join(__dirname, "views"))
 app.use('/static', express.static('public'))
 app.use(bodyParser.json());
 
-//support parsing of application/x-www-form-urlencoded post data
+//<======support parsing of application to post data/ bodyparser is req to ref. req.body
 app.use(bodyParser.urlencoded({ extended: true }));
 
-//works
+//<======when routed to / (home) it will redirect to url "/books"===>
 app.get('/', (req, res) => {
   res.redirect('/books');
 });
 
-//works
+//<======on route /books , books will findAll my books which is inside of models Book.js,
+//and render my index pug with the parameter of books . If there is an error my page not
+//found pug will be rendered===================================> 
 app.get('/books', async (req, res) => {
   try {
     const books = await Book.findAll()
@@ -29,12 +32,14 @@ app.get('/books', async (req, res) => {
   };
 });
 
-//works
+//<======on route /books/new , my new book pug will be render======>
 app.get('/books/new', (req, res) => {
   res.render("new-book");
 });
 
-//Works
+//<=====on route /books/new , my async function will try and await a book.create,
+//when data is passed into form tit,aut,gen,yr. Data will be submitted to database as a new book
+//on submit page will redirect to /books (home) once submitted=====>
 app.post('/books/new', async (req, res) => {
   try {
     const { title, author, genre, year } = req.body
@@ -57,26 +62,32 @@ app.post('/books/new', async (req, res) => {
   }
 });
 
-//works
+//<======on route /book/:id , set book as selected book id by using findByPk,
+//once book id is selected my update-book will be rendered.======>
+//findByPk is a way to find by ID
 app.get('/book/:id', async (req, res) => {
   const book = await Book.findByPk(req.params.id);
   res.render('update-book', { book });
 });
 
-//Works
+//<=====on route /book/:id , it will find selected book and place the id in url,
+//any information changed in book will update the req.body and will redirect to /books 
+//on submit.=====================================================>
 app.post('/book/:id', async (req, res) => {
   const book = await Book.findByPk(req.params.id);
   await book.update(req.body)
   res.redirect('/books')
 });
 
-app.post('/books/:id/delete', async (req, res) => {
+//<======on route book/:id/delete it will set my const to find selected book and place the id in url/delete,
+//on delete it will destroy that const (id) and redirect to home (/books) on submit
+app.post('/book/:id/delete', async (req, res) => {
   const bookDestroy = await Book.findByPk(req.params.id);
   await bookDestroy.destroy();
   res.redirect('/books');
 })
 
-//works
+//<=======middleware error handler for status 404 (not Found) || 500 (internal server error)
 app.use((req, res, next) => {
   const err = new Error("Oh No !An error has occured")
   err.status = 404 || 500
@@ -88,7 +99,7 @@ app.use((err, req, res, next) => {
   res.render('page-not-found')
 });
 
-//works
+//sequelize.sync creates all of the tables in the specified database
 sequelize.sync().then(() => {
   app.listen(port);
   console.log("This application is listening on port " + port)
