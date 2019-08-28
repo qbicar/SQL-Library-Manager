@@ -65,15 +65,27 @@ app.post('/books/new', async (req, res) => {
 //<======on route /book/:id , set book as selected book id by using findByPk,
 //once book id is selected my update-book will be rendered.======>
 //findByPk is a way to find by ID
-app.get('/book/:id', async (req, res) => {
-  const book = await Book.findByPk(req.params.id);
-  res.render('update-book', { book });
+app.get('/books/:id', (req, res, next) => {
+  Book.findByPk(req.params.id)
+    .then(book => {
+      if (book) {
+        res.render('update-book', { book });
+      } else {
+        const err = new Error();
+        err.status = 404
+        next(err);
+      }
+    })
+    .catch(err => {
+      err.status = 500;
+      next(err);
+    })
 });
 
 //<=====on route /book/:id , it will find selected book and place the id in url,
 //any information changed in book will update the req.body and will redirect to /books 
 //on submit.=====================================================>
-app.post('/book/:id', async (req, res) => {
+app.post('/books/:id', async (req, res) => {
   const book = await Book.findByPk(req.params.id);
   await book.update(req.body)
   res.redirect('/books')
@@ -81,7 +93,7 @@ app.post('/book/:id', async (req, res) => {
 
 //<======on route book/:id/delete it will set my const to find selected book and place the id in url/delete,
 //on delete it will destroy that const (id) and redirect to home (/books) on submit
-app.post('/book/:id/delete', async (req, res) => {
+app.post('/books/:id/delete', async (req, res) => {
   const bookDestroy = await Book.findByPk(req.params.id);
   await bookDestroy.destroy();
   res.redirect('/books');
@@ -89,18 +101,18 @@ app.post('/book/:id/delete', async (req, res) => {
 
 //<=======middleware error handler for status 404 (not Found) || 500 (internal server error)
 app.use((req, res, next) => {
-  const err = new Error("Oh No !An error has occured")
-  err.status = 404 || 500
-  next(err)
+  const err = new Error("Oh No !An error has occured");
+  err.status = 404 || 500;
+  next(err);
 })
 app.use((err, req, res, next) => {
-  res.locals.error = err
-  res.status(err.status)
-  res.render('page-not-found')
+  res.locals.error = err;
+  res.status(err.status);
+  res.render('page-not-found');
 });
 
 //sequelize.sync creates all of the tables in the specified database
 sequelize.sync().then(() => {
   app.listen(port);
-  console.log("This application is listening on port " + port)
+  console.log("This application is listening on port " + port);
 });
